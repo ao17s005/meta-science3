@@ -1,0 +1,226 @@
+---
+title: "Evaluations of positive and negative stimuli using the Affective Misattribution Procedure (AMP) and self-reports"
+subtitle: "Data processing"
+author: "Template: Ian Hussey; content: [Student name]"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    code_folding: hide
+    highlight: haddock
+    theme: flatly
+    toc: yes
+    toc_float: yes
+---
+
+# TODO
+
+- Add data processing
+- Combine data frames
+- Save to disk
+
+```{r, include=FALSE}
+
+knitr::opts_chunk$set(message = FALSE,
+                      warning = FALSE)
+
+```
+
+# Dependencies
+
+```{r}
+
+library(tidyverse)
+library(janitor) # for clean_names()
+library(stringr)
+
+```
+
+# Get data
+
+```{r}
+
+# demographics
+data_demographics_raw <- read_csv("../../../data/AMP study/raw/data_demographics_raw.csv")
+
+data_demographics_raw_messy <- read_csv("../../../data/AMP study/raw/data_demographics_raw_messy.csv", skip = 2)
+#data_demographics_raw_messy <- read_csv("../../../data/AMP study/raw/data_demographics_raw_messy.csv")
+#how manyy rows should I skip? 2
+
+# self report measure
+data_selfreport_raw <- read_csv("../../../data/AMP study/raw/data_selfreport_raw.csv")
+
+# affect attribution procedure
+data_amp_raw <- read_csv("../../../data/AMP study/raw/data_amp_raw.csv") 
+
+```
+
+
+# Slice
+
+```{r}
+
+```
+
+
+```{r}
+dat_gender <- data_demographics_raw_messy %>% 
+  rename(response = `!! Key response`)
+```
+
+
+# Demographics
+
+TODO extract age and gender data into wide format
+
+# Q1: data_demographics_raw_messy.csv contains (fake) sensitive data that legally cannot be made open. If it was real data, it should never be put on a public github repo where others can access it. What function would you use to drop these rows from the dataset?
+ - to drop these columns age and gender I'd use select (), either by selecting the ones I want
+ to keep or the ones I want to remove by -
+ 
+# Q2: data_demographics_raw.csv contains more columns than needed. Which ones are important to extract, and what function would you use to do this? 
+- I'd  use the select() function as well
+
+```{r}
+
+data_demographics_raw_messy <- data_demographics_raw_messy |>
+  clean_names() |> 
+  filter(!trial_code %in% c("prolific ID", "psychiatric diagnosis"))
+
+# select relevant column
+dat_gender <- data_demographics_raw %>% 
+  clean_names() |> 
+  select(subject, date, time, trialcode, response)
+
+# gender
+dat_gender <- dat_gender |> 
+  filter(trialcode == "gender") |> 
+  rename(gender = response) |> 
+  mutate(gender = tolower(gender),
+         gender = stringr::str_remove_all(gender,
+                                          regex("\\W+")),
+         gender = case_when( gender == "female" ~ gender,
+         gender == "male" ~ gender,
+         gender == "nonbinary" ~ gender,
+         gender == "woman" ~ "female",
+         gender == "man" ~ "male",
+         TRUE ~ "other/error/missing")) |> 
+  select(-trialcode)
+
+# count
+dat_gender |> 
+  count(gender)
+
+# age variable
+dat_age <- data_demographics_raw_messy |> 
+  clean_names()
+
+dat_age <- dat_age |> 
+  select(subject, date, time, trial_code, key_response) |> 
+  filter(trial_code == "age") |> 
+  rename(age = trial_code) |> 
+  mutate(age = as.numeric(age),
+         age = ifelse(is.na(age), "other/error/missing", age))
+
+#combine gender and age data frame
+dat_age_gender <- 
+  full_join(dat_age,data_demographics)
+
+
+## My way
+
+# names
+data_demographics |> 
+  distinct(trialcode) |> 
+  pull()
+
+# not names and not measurements, id_cols
+data_demographics |> 
+  select(-trialcode, -response) |> 
+  distinct()
+
+# identify duplicates
+data_demographics |> 
+  group_by(subject, trialcode) |> 
+  summarize(n = n(), .groups = "drop") |> 
+  filter(n > 1)
+
+duplicates <- data_demographics |> 
+  filter(subject == "246532124")
+
+data_demographics <- data_demographics |> 
+  slice(-c(7, 8))
+
+# pivot wider
+data_demo_wide <- data_demographics |> 
+  pivot_wider(
+    names_from = trialcode,
+    values_from = response
+  )
+View(data_demo_wide)
+
+# create new column with mutate()
+data_demo_wide$age <- as.numeric(data_demo_wide$age )
+data_demo_wide <- data_demo_wide |> 
+  mutate(months = age *12)
+
+
+```
+
+
+
+
+# Exclusions / data quality?
+
+```{r}
+
+
+```
+
+# Self-reports
+
+TODO extract self-reported evaluations and convert to a sum score
+
+```{r}
+
+
+
+```
+
+# Affect Misattribution Procedure
+
+TODO extract evaluations on the AMP test blocks and convert to an overall bias score
+
+```{r}
+
+
+
+```
+
+# Combine
+
+TODO combine demographics, self-reports and AMP into a single data frame in wide format, i.e., the processed data
+
+```{r}
+
+
+
+```
+
+# Write to disk
+
+TODO write the processed data to disk
+
+```{r}
+
+
+
+```
+
+# Session info
+
+```{r}
+
+sessionInfo()
+
+```
+
+
