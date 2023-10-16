@@ -42,29 +42,28 @@ library(stringr)
 # demographics
 data_demographics_raw <- read_csv("../../../data/AMP study/raw/data_demographics_raw.csv")
 
-data_demographics_raw_messy <- read_csv("../../../data/AMP study/raw/data_demographics_raw_messy.csv", skip = 2)
+data_demographics_raw_messy <- read_csv("../../../data/AMP study/raw/data_demographics_raw_messy.csv", skip = 2) |> 
+  janitor::clean_names()
 #data_demographics_raw_messy <- read_csv("../../../data/AMP study/raw/data_demographics_raw_messy.csv")
 #how manyy rows should I skip? 2
 
 # self report measure
-data_selfreport_raw <- read_csv("../../../data/AMP study/raw/data_selfreport_raw.csv")
+data_selfreport_raw <- read_csv("../../../data/AMP study/raw/data_selfreport_raw.csv") |> 
+  janitor::clean_names()
 
 # affect attribution procedure
-data_amp_raw <- read_csv("../../../data/AMP study/raw/data_amp_raw.csv") 
+data_amp_raw <- read_csv("../../../data/AMP study/raw/data_amp_raw.csv") |> 
+  janitor::clean_names()
 
 ```
 
 
-# Slice
+# Relevante Fälle herausfiltern, bzw. sensitive data weglassen
 
 ```{r}
-
-```
-
-
-```{r}
-dat_gender <- data_demographics_raw_messy %>% 
-  rename(response = `!! Key response`)
+# dat <- data_demographics_raw_messy |>
+#   filter(!trial_code %in% c("prolific ID", "psychiatric diagnosis")) |>
+#   select(subject, date, time, trial_code, key_response)
 ```
 
 
@@ -80,14 +79,8 @@ TODO extract age and gender data into wide format
 - I'd  use the select() function as well
 
 ```{r}
-
-data_demographics_raw_messy <- data_demographics_raw_messy |>
-  clean_names() |> 
-  filter(!trial_code %in% c("prolific ID", "psychiatric diagnosis"))
-
 # select relevant column
 dat_gender <- data_demographics_raw %>% 
-  clean_names() |> 
   select(subject, date, time, trialcode, response)
 
 # gender
@@ -95,9 +88,8 @@ dat_gender <- dat_gender |>
   filter(trialcode == "gender") |> 
   rename(gender = response) |> 
   mutate(gender = tolower(gender),
-         gender = stringr::str_remove_all(gender,
-                                          regex("\\W+")),
-         gender = case_when( gender == "female" ~ gender,
+         gender = stringr::str_remove_all(gender,regex("\\W+")), #what does regex again?
+         gender = case_when(gender == "female" ~ gender,
          gender == "male" ~ gender,
          gender == "nonbinary" ~ gender,
          gender == "woman" ~ "female",
@@ -110,47 +102,55 @@ dat_gender |>
   count(gender)
 
 # age variable
-dat_age <- data_demographics_raw_messy |> 
-  clean_names()
-
-dat_age <- dat_age |> 
-  select(subject, date, time, trial_code, key_response) |> 
-  filter(trial_code == "age") |> 
-  rename(age = trial_code) |> 
+dat_age <- data_demographics_raw |> 
+  select(subject, date, time, trialcode, response) |> 
+  filter(trialcode == "age") |> 
+  rename(age = response) |> 
   mutate(age = as.numeric(age),
-         age = ifelse(is.na(age), "other/error/missing", age))
+         age = ifelse(is.na(age), "other/error/missing", age)) |> 
+  select(-trialcode)
+
+#count age
+dat_age |> 
+  count(age)
 
 #combine gender and age data frame
 dat_age_gender <- 
-  full_join(dat_age,data_demographics)
+  full_join(dat_age,
+            dat_gender, 
+            by = c("subject", "date", "time"))
 
 
-## My way
+```
 
+
+## Option 2
+
+```{r}
 # names
-data_demographics |> 
+data_demographics_raw |> 
   distinct(trialcode) |> 
   pull()
 
 # not names and not measurements, id_cols
-data_demographics |> 
+data_demographics_raw |> 
   select(-trialcode, -response) |> 
   distinct()
 
 # identify duplicates
-data_demographics |> 
+data_demographics_raw |> 
   group_by(subject, trialcode) |> 
   summarize(n = n(), .groups = "drop") |> 
   filter(n > 1)
 
-duplicates <- data_demographics |> 
-  filter(subject == "246532124")
+duplicates <- data_demographics_raw |> 
+  filter(time != "12:32:30" & subject != "246532124")
 
-data_demographics <- data_demographics |> 
+data_demographics_raw <- data_demographics_raw|> 
   slice(-c(7, 8))
 
 # pivot wider
-data_demo_wide <- data_demographics |> 
+data_demo_wide <- data_demographics_raw |> 
   pivot_wider(
     names_from = trialcode,
     values_from = response
@@ -164,7 +164,6 @@ data_demo_wide <- data_demo_wide |>
 
 
 ```
-
 
 
 

@@ -9,10 +9,10 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Template: Ian Hussey; Content: [student name]" />
+<meta name="author" content="Template: Ian Hussey; content: [Student name]" />
 
 
-<title>Important functions for data wrangling</title>
+<title>Evaluations of positive and negative stimuli using the Affective Misattribution Procedure (AMP) and self-reports</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -1666,294 +1666,140 @@ border-radius: 0px;
 
 
 
-<h1 class="title toc-ignore">Important functions for data wrangling</h1>
-<h4 class="author">Template: Ian Hussey; Content: [student name]</h4>
+<h1 class="title toc-ignore">Evaluations of positive and negative
+stimuli using the Affective Misattribution Procedure (AMP) and
+self-reports</h1>
+<h3 class="subtitle">Data processing</h3>
+<h4 class="author">Template: Ian Hussey; content: [Student name]</h4>
 <h4 class="date">16 October, 2023</h4>
 
 </div>
 
 
-<div id="instructions" class="section level1">
-<h1>Instructions</h1>
-<p>Most data wrangling tasks can be accomplished with a relatively small
-number of functions. I’ve listed the most important ones here.</p>
-<p>Use this file to keep notes about what a given function does in your
-own words, the situations where you would use it, and working examples.
-You can make use of built-in datasets to do this (e.g.,
-<code>mtcars</code>) or load external data sets (although its easier to
-break the examples if you modify the data etc.).</p>
-<p>Learning how to wrangle data efficiently involves a combination of
-knowing how to break the problem down into smaller components; knowing
-which functions are available to accomplish each component operation and
-how to use them; how to search documentation to learn or refresh your
-knowledge of how a function works; and how to discover new functions
-that accomplish new component operations.</p>
-<p>Remember that you can look up the help documentation for any function
-by typing a question mark followed by its name in the console, e.g.,
-<code>?dplyr::mutate</code>. The help documentation provides details of
-a function’s parameters and defaults, its outputs, and examples of its
-use. Note that when you can also open the help documentation for an
-entire package by typing the package name, e.g., <code>?dplyr</code>.
-This can be very useful to discover what other functions that package
-has: scroll down to the bottom of any help page and click the “Index”
-link to see all help pages for that package.</p>
-<p>I have prepended each function below with package it comes from so
-that you know. For example, <code>summarize</code> is listed as
-<code>dplyr::summarize</code>. Usually you don’t have to do this when
-using a function, although you can use this to resolve a common bug
-known as name conflicts (see <a href="https://www.r-bloggers.com/2010/08/namespaces-and-name-conflicts/">this
-blog post</a> for discussion).</p>
-</div>
-<div id="resources-for-this-session-and-others" class="section level1">
-<h1>Resources (for this session and others)</h1>
+<div id="todo" class="section level1">
+<h1>TODO</h1>
 <ul>
-<li>You can find cheatsheets for the dplyr, tidyr, and RMarkdown in the
-/resources/cheatsheets folder.</li>
-<li>The Open Source textbook R for Data Science (aka, <a href="https://r4ds.hadley.nz/">Wickham’s R4DS</a>) is invaluable. Hadley
-Wickham is the main developer of the “tidyverse” set of packages,
-including dplyr, tidyr, ggplot2, stringr, lubridate, and others. See its
-<a href="https://r4ds.hadley.nz/data-transform">section on data
-transformation</a>.
-<ul>
-<li>The entire second edition of the book is available at <a href="https://r4ds.hadley.nz/">https://r4ds.hadley.nz/</a>.</li>
-<li>The first edition is also available. It does some things better in
-my opinion, e.g., it has a better explanation of the pipe
-(<code>%&gt;%</code> or <code>|&gt;</code>). See <a href="https://r4ds.had.co.nz/pipes.html">https://r4ds.had.co.nz/pipes.html</a>.</li>
-<li>The first edition also talks about RMarkdown, whereas the second
-edition has moved to a different technology called Quarto (which we
-won’t cover, although they’re similar). See <a href="https://r4ds.had.co.nz/r-markdown.html">https://r4ds.had.co.nz/r-markdown.html</a>.</li>
-</ul></li>
-<li>For those of you who prefer to learn in an interactive environment,
-I now suggest this web app over Swirl as it is more user-friendly: <a href="https://allisonhorst.shinyapps.io/dplyr-learnr/#section-welcome">https://allisonhorst.shinyapps.io/dplyr-learnr/#section-welcome</a>.</li>
-<li>For those of you who prefer some video content - although seeing
-other people code can never replace practicing coding yourself! - I can
-also recommend De Bruine et al.’s Open Source textbook and videos <a href="https://psyteachr.github.io/reprores-v3/">Data Skills for
-Reproducible Research</a>. E.g., see their page with links to videos for
-<a href="https://psyteachr.github.io/reprores-v3/dplyr.html">dplyr</a>
-and <a href="https://psyteachr.github.io/reprores-v3/tidyr.html">tidyr</a>.</li>
+<li>Add data processing</li>
+<li>Combine data frames</li>
+<li>Save to disk</li>
 </ul>
 </div>
 <div id="dependencies" class="section level1">
 <h1>Dependencies</h1>
-<p>The packages these functions come from, which must be loaded to use
-them.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(readr)</span>
-<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
-<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
-<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
-<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a><span class="fu">library</span>(kableExtra)</span>
-<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a><span class="fu">library</span>(janitor)</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">library</span>(janitor) <span class="co"># for clean_names()</span></span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="fu">library</span>(stringr)</span></code></pre></div>
 </div>
-<div id="basics" class="section level1">
-<h1>Basics</h1>
-<div id="read_csv" class="section level2">
-<h2>read_csv</h2>
-<p>vs. <code>read.csv()</code></p>
-<p><em>Always, always, always</em> use relative paths rather than
-absolute paths.</p>
-<ul>
-<li>Absolute path (bad):
-“~/Ian/Desktop/my_project/data/data_raw.csv”</li>
-<li>Relative path (good): “../data/data_raw.csv”</li>
-</ul>
-<p>When using relative paths: “../” means up one directory level,
-whereas “directory_name/” goes down one directory level.</p>
-<p>Relative paths will work on other machines, where absolute paths will
-break.</p>
-<p>Relative paths only work in .Rmd files and not .R files. Even without
-RMarkdown’s other benefits, this makes them worth using.</p>
-<p>Useful arguments: skip = n, number of rows I want to skip</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co"># readr::read_csv()</span></span></code></pre></div>
+<div id="get-data" class="section level1">
+<h1>Get data</h1>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co"># demographics</span></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>data_demographics_raw <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;../../../data/AMP study/raw/data_demographics_raw.csv&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>  janitor<span class="sc">::</span><span class="fu">clean_names</span>()</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>data_demographics_raw_messy <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;../../../data/AMP study/raw/data_demographics_raw_messy.csv&quot;</span>, <span class="at">skip =</span> <span class="dv">2</span>) <span class="sc">|&gt;</span></span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>  janitor<span class="sc">::</span><span class="fu">clean_names</span>()</span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="co"># self report measure</span></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>data_selfreport_raw <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;../../../data/AMP study/raw/data_selfreport_raw.csv&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>  janitor<span class="sc">::</span><span class="fu">clean_names</span>()</span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a><span class="co"># affect attribution procedure</span></span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a>data_amp_raw <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;../../../data/AMP study/raw/data_amp_raw.csv&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a>  janitor<span class="sc">::</span><span class="fu">clean_names</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co"># dat &lt;- data_demographics_raw_messy |&gt;</span></span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="co">#   filter(!trial_code %in% c(&quot;prolific ID&quot;, &quot;psychiatric diagnosis&quot;)) |&gt;</span></span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="co">#   select(subject, date, time, trial_code, key_response)</span></span></code></pre></div>
 </div>
-<div id="dir.create" class="section level2">
-<h2>dir.create</h2>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co"># dir.create()</span></span></code></pre></div>
+<div id="demographics" class="section level1">
+<h1>Demographics</h1>
+<p>TODO extract age and gender data into wide format</p>
+<div id="option-1" class="section level2">
+<h2>Option 1</h2>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>dat <span class="ot">&lt;-</span> data_demographics_raw <span class="sc">|&gt;</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>  <span class="fu">select</span>(subject, date, time, trialcode, response)</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>dat_gender <span class="ot">&lt;-</span> dat <span class="sc">|&gt;</span></span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>  <span class="fu">filter</span>(trialcode <span class="sc">==</span> <span class="st">&quot;gender&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">gender =</span> response) <span class="sc">|&gt;</span></span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gender =</span> <span class="fu">tolower</span>(gender),</span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>         <span class="co"># regex is useful and awful</span></span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>         <span class="at">gender =</span> stringr<span class="sc">::</span><span class="fu">str_remove_all</span>(gender, <span class="fu">regex</span>(<span class="st">&quot;</span><span class="sc">\\</span><span class="st">W+&quot;</span>)),</span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a>         <span class="at">gender =</span> <span class="fu">case_when</span>(gender <span class="sc">==</span> <span class="st">&quot;female&quot;</span> <span class="sc">~</span> gender,</span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a>                            gender <span class="sc">==</span> <span class="st">&quot;male&quot;</span> <span class="sc">~</span> gender,</span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a>                            gender <span class="sc">==</span> <span class="st">&quot;nonbinary&quot;</span> <span class="sc">~</span> gender,</span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a>                            gender <span class="sc">==</span> <span class="st">&quot;woman&quot;</span> <span class="sc">~</span> <span class="st">&quot;female&quot;</span>,</span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a>                            gender <span class="sc">==</span> <span class="st">&quot;man&quot;</span> <span class="sc">~</span> <span class="st">&quot;male&quot;</span>,</span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a>                            <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">&quot;other/missing/error&quot;</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>trialcode)</span>
+<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a></span>
+<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a>dat_gender <span class="sc">|&gt;</span></span>
+<span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a>  <span class="fu">count</span>(gender)</span></code></pre></div>
+<pre><code>## # A tibble: 4 × 2
+##   gender                  n
+##   &lt;chr&gt;               &lt;int&gt;
+## 1 female                 40
+## 2 male                   55
+## 3 nonbinary               3
+## 4 other/missing/error     2</code></pre>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>dat_age <span class="ot">&lt;-</span> dat <span class="sc">|&gt;</span></span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>  <span class="fu">filter</span>(trialcode <span class="sc">==</span> <span class="st">&quot;age&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">age =</span> response) <span class="sc">|&gt;</span></span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">age =</span> <span class="fu">as.numeric</span>(age),</span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>         <span class="at">age =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(age), <span class="st">&quot;other/missing/error&quot;</span>, age)) <span class="sc">|&gt;</span></span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>trialcode)</span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a></span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>dat_age <span class="sc">|&gt;</span></span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a>  <span class="fu">count</span>(age)</span></code></pre></div>
+<pre><code>## # A tibble: 40 × 2
+##    age       n
+##    &lt;chr&gt; &lt;int&gt;
+##  1 18        1
+##  2 19        4
+##  3 20        1
+##  4 21        6
+##  5 22        2
+##  6 23        5
+##  7 24        1
+##  8 25        3
+##  9 26        4
+## 10 27        5
+## # ℹ 30 more rows</code></pre>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>dat_age_gender <span class="ot">&lt;-</span> </span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>  <span class="fu">full_join</span>(dat_age, </span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>            dat_gender,</span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>            <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;subject&quot;</span>, <span class="st">&quot;date&quot;</span>, <span class="st">&quot;time&quot;</span>))</span></code></pre></div>
 </div>
-<div id="colnames-dput" class="section level2">
-<h2>colnames &amp; dput</h2>
-<p>I can use colnames to check on the names of the dataset</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="co"># colnames()</span></span>
-<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a></span>
-<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="co"># dput(colnames())</span></span></code></pre></div>
-</div>
-</div>
-<div id="wrangling" class="section level1">
-<h1>Wrangling</h1>
-<div id="the-pipe-or" class="section level2">
-<h2>the pipe: <code>%&gt;%</code> or <code>|&gt;</code></h2>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co"># %&gt;%</span></span>
-<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a></span>
-<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="co"># |&gt;</span></span></code></pre></div>
-</div>
-<div id="round_half_up" class="section level2">
-<h2>round_half_up</h2>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="co"># janitor::round_half_up()</span></span></code></pre></div>
-</div>
-<div id="clean_names" class="section level2">
-<h2>clean_names</h2>
-<p>I can use this function to clean the names of all the variables in
-the dataset. It should be included in the normal data flow.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="co"># janitor::clean_names()</span></span></code></pre></div>
-</div>
-<div id="filter" class="section level2">
-<h2>filter</h2>
-<p>changes, which rows are present without changing their order
-(vs. arrange () which changes the order of the rows, but not which rows
-are in or out)</p>
-<p>!= not equal to | or</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="co"># dplyr::filter()</span></span></code></pre></div>
-</div>
-<div id="slice-to-cut-out-rows-or-retaining-rows" class="section level2">
-<h2>slice: to cut out rows or retaining rows</h2>
-<p>We might ue it just after reading in files if there are junk rows at
-the header.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="co"># dplyr::slice()</span></span>
-<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>mtcars <span class="co"># this should have 32 rows</span></span></code></pre></div>
-<pre><code>##                      mpg cyl  disp  hp drat    wt  qsec vs am gear carb
-## Mazda RX4           21.0   6 160.0 110 3.90 2.620 16.46  0  1    4    4
-## Mazda RX4 Wag       21.0   6 160.0 110 3.90 2.875 17.02  0  1    4    4
-## Datsun 710          22.8   4 108.0  93 3.85 2.320 18.61  1  1    4    1
-## Hornet 4 Drive      21.4   6 258.0 110 3.08 3.215 19.44  1  0    3    1
-## Hornet Sportabout   18.7   8 360.0 175 3.15 3.440 17.02  0  0    3    2
-## Valiant             18.1   6 225.0 105 2.76 3.460 20.22  1  0    3    1
-## Duster 360          14.3   8 360.0 245 3.21 3.570 15.84  0  0    3    4
-## Merc 240D           24.4   4 146.7  62 3.69 3.190 20.00  1  0    4    2
-## Merc 230            22.8   4 140.8  95 3.92 3.150 22.90  1  0    4    2
-## Merc 280            19.2   6 167.6 123 3.92 3.440 18.30  1  0    4    4
-## Merc 280C           17.8   6 167.6 123 3.92 3.440 18.90  1  0    4    4
-## Merc 450SE          16.4   8 275.8 180 3.07 4.070 17.40  0  0    3    3
-## Merc 450SL          17.3   8 275.8 180 3.07 3.730 17.60  0  0    3    3
-## Merc 450SLC         15.2   8 275.8 180 3.07 3.780 18.00  0  0    3    3
-## Cadillac Fleetwood  10.4   8 472.0 205 2.93 5.250 17.98  0  0    3    4
-## Lincoln Continental 10.4   8 460.0 215 3.00 5.424 17.82  0  0    3    4
-## Chrysler Imperial   14.7   8 440.0 230 3.23 5.345 17.42  0  0    3    4
-## Fiat 128            32.4   4  78.7  66 4.08 2.200 19.47  1  1    4    1
-## Honda Civic         30.4   4  75.7  52 4.93 1.615 18.52  1  1    4    2
-## Toyota Corolla      33.9   4  71.1  65 4.22 1.835 19.90  1  1    4    1
-## Toyota Corona       21.5   4 120.1  97 3.70 2.465 20.01  1  0    3    1
-## Dodge Challenger    15.5   8 318.0 150 2.76 3.520 16.87  0  0    3    2
-## AMC Javelin         15.2   8 304.0 150 3.15 3.435 17.30  0  0    3    2
-## Camaro Z28          13.3   8 350.0 245 3.73 3.840 15.41  0  0    3    4
-## Pontiac Firebird    19.2   8 400.0 175 3.08 3.845 17.05  0  0    3    2
-## Fiat X1-9           27.3   4  79.0  66 4.08 1.935 18.90  1  1    4    1
-## Porsche 914-2       26.0   4 120.3  91 4.43 2.140 16.70  0  1    5    2
-## Lotus Europa        30.4   4  95.1 113 3.77 1.513 16.90  1  1    5    2
-## Ford Pantera L      15.8   8 351.0 264 4.22 3.170 14.50  0  1    5    4
-## Ferrari Dino        19.7   6 145.0 175 3.62 2.770 15.50  0  1    5    6
-## Maserati Bora       15.0   8 301.0 335 3.54 3.570 14.60  0  1    5    8
-## Volvo 142E          21.4   4 121.0 109 4.11 2.780 18.60  1  1    4    2</code></pre>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="fu">slice</span>(mtcars, <span class="dv">2</span>, <span class="fu">n</span>()) <span class="co"># built in data, this should have 31 rows</span></span></code></pre></div>
-<pre><code>##                mpg cyl disp  hp drat    wt  qsec vs am gear carb
-## Mazda RX4 Wag 21.0   6  160 110 3.90 2.875 17.02  0  1    4    4
-## Volvo 142E    21.4   4  121 109 4.11 2.780 18.60  1  1    4    2</code></pre>
-</div>
-<div id="select" class="section level2">
-<h2>select</h2>
-<p>selects the columns, I want to keep in my data 1) new name = old name
-, 2) name1: name5 = selects all in between, 3) !name1:name5 = all
-columns except them.</p>
-<p>helper functions: starts_with(“a”), ends_with(“z”), contains(“m”),
-num_range(x, 1:3) = matches x1, x2 and x3</p>
-<p>What is very handy, is, you can directly rename in select.</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="co"># dplyr::select()</span></span></code></pre></div>
-</div>
-<div id="rename" class="section level2">
-<h2>rename</h2>
-<p>old name = new name I can rename columns with it</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="co"># dplyr::rename()</span></span></code></pre></div>
-</div>
-<div id="mutate" class="section level2">
-<h2>mutate</h2>
-<p>for creating new columns with the existing data with the .before
-argument I can add the new column to the left hand side</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="co"># dplyr::mutate()</span></span></code></pre></div>
-</div>
-<div id="case_when" class="section level2">
-<h2>case_when</h2>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="co"># dplyr::case_when() # instead of ifelse()</span></span></code></pre></div>
-</div>
-<div id="summarize" class="section level2">
-<h2>summarize</h2>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a><span class="co"># dplyr::summarize() </span></span></code></pre></div>
-</div>
-<div id="count" class="section level2">
-<h2>count</h2>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a><span class="co"># dplyr::count()</span></span></code></pre></div>
-</div>
-<div id="distinct" class="section level2">
-<h2>distinct</h2>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" tabindex="-1"></a><span class="co"># dplyr::distinct()</span></span></code></pre></div>
-</div>
-<div id="group_by" class="section level2">
-<h2>group_by</h2>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a><span class="co"># dplyr::group_by() # or &quot;.by =&quot; </span></span></code></pre></div>
-</div>
-<div id="rowwise" class="section level2">
-<h2>rowwise</h2>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" tabindex="-1"></a><span class="co"># dplyr::rowwise()</span></span></code></pre></div>
-</div>
-<div id="lead" class="section level2">
-<h2>lead</h2>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a><span class="co"># dplyr::lead()</span></span></code></pre></div>
-</div>
-<div id="lag" class="section level2">
-<h2>lag</h2>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" tabindex="-1"></a><span class="co"># dplyr::lag()</span></span></code></pre></div>
-</div>
-<div id="joins" class="section level2">
-<h2>joins</h2>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" tabindex="-1"></a><span class="co"># dplyr::full_join()</span></span>
-<span id="cb24-2"><a href="#cb24-2" tabindex="-1"></a></span>
-<span id="cb24-3"><a href="#cb24-3" tabindex="-1"></a><span class="co"># dplyr::left_join()</span></span>
-<span id="cb24-4"><a href="#cb24-4" tabindex="-1"></a></span>
-<span id="cb24-5"><a href="#cb24-5" tabindex="-1"></a><span class="co"># dplyr::right_join()</span></span>
-<span id="cb24-6"><a href="#cb24-6" tabindex="-1"></a></span>
-<span id="cb24-7"><a href="#cb24-7" tabindex="-1"></a><span class="co"># dplyr::inner_join()</span></span>
-<span id="cb24-8"><a href="#cb24-8" tabindex="-1"></a></span>
-<span id="cb24-9"><a href="#cb24-9" tabindex="-1"></a><span class="co"># dplyr::semi_join()</span></span></code></pre></div>
-</div>
-<div id="pivots" class="section level2">
-<h2>pivots</h2>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" tabindex="-1"></a><span class="co"># tidyr::pivot_wider()</span></span>
-<span id="cb25-2"><a href="#cb25-2" tabindex="-1"></a></span>
-<span id="cb25-3"><a href="#cb25-3" tabindex="-1"></a><span class="co"># tidyr::pivot_longer()</span></span></code></pre></div>
-</div>
-<div id="drop_na" class="section level2">
-<h2>drop_na</h2>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" tabindex="-1"></a><span class="co"># tidyr::drop_na()</span></span></code></pre></div>
-</div>
-<div id="separate" class="section level2">
-<h2>separate</h2>
-<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" tabindex="-1"></a><span class="co"># tidyr::separate()</span></span></code></pre></div>
-</div>
-<div id="fill" class="section level2">
-<h2>fill</h2>
-<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" tabindex="-1"></a><span class="co"># tidyr::fill()</span></span></code></pre></div>
+<div id="option-2" class="section level2">
+<h2>Option 2</h2>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>dat_wide <span class="ot">&lt;-</span> dat <span class="sc">|&gt;</span></span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> trialcode,</span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>              <span class="at">values_from =</span> response)</span></code></pre></div>
 </div>
 </div>
-<div id="printing-tables" class="section level1">
-<h1>Printing tables</h1>
-<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" tabindex="-1"></a><span class="co"># mtcars |&gt; # example data</span></span>
-<span id="cb29-2"><a href="#cb29-2" tabindex="-1"></a><span class="co">#   knitr::kable() |&gt; # print a nicer looking table</span></span>
-<span id="cb29-3"><a href="#cb29-3" tabindex="-1"></a><span class="co">#   kableExtra::kable_classic(full_width = FALSE) # print nicer again</span></span></code></pre></div>
+<div id="exclusions-data-quality" class="section level1">
+<h1>Exclusions / data quality?</h1>
 </div>
-<div id="other-packages" class="section level1">
-<h1>Other packages</h1>
-<p>Other packages you may need for wrangling which aren’t covered
-here:</p>
-<ul>
-<li>library(forcats). Everything to do with factors and factor levels.
-Useful for plotting and establishing reference levels for statistical
-tests.</li>
-<li>library(stringr). Everything to do with strings, searching for
-strings, modifying strings, parsing them, etc.</li>
-<li>library(lubridate). Everything to do with dates, parsing dates,
-converting date formats, etc.</li>
-</ul>
+<div id="self-reports" class="section level1">
+<h1>Self-reports</h1>
+<p>TODO extract self-reported evaluations and convert to a sum score</p>
+</div>
+<div id="affect-misattribution-procedure" class="section level1">
+<h1>Affect Misattribution Procedure</h1>
+<p>TODO extract evaluations on the AMP test blocks and convert to an
+overall bias score</p>
+</div>
+<div id="combine" class="section level1">
+<h1>Combine</h1>
+<p>TODO combine demographics, self-reports and AMP into a single data
+frame in wide format, i.e., the processed data</p>
+</div>
+<div id="write-to-disk" class="section level1">
+<h1>Write to disk</h1>
+<p>TODO write the processed data to disk</p>
 </div>
 <div id="session-info" class="section level1">
 <h1>Session info</h1>
-<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code></pre></div>
 <pre><code>## R version 4.2.3 (2023-03-15)
 ## Platform: x86_64-apple-darwin17.0 (64-bit)
 ## Running under: macOS Big Sur ... 10.16
@@ -1969,22 +1815,23 @@ converting date formats, etc.</li>
 ## [1] stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-## [1] janitor_2.2.0    kableExtra_1.3.4 knitr_1.42       tidyr_1.3.0     
-## [5] dplyr_1.1.2      readr_2.1.4     
+##  [1] janitor_2.2.0   lubridate_1.9.2 forcats_1.0.0   stringr_1.5.0  
+##  [5] dplyr_1.1.2     purrr_1.0.1     readr_2.1.4     tidyr_1.3.0    
+##  [9] tibble_3.2.1    ggplot2_3.4.2   tidyverse_2.0.0
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] pillar_1.9.0      bslib_0.4.2       compiler_4.2.3    jquerylib_0.1.4  
-##  [5] tools_4.2.3       digest_0.6.31     timechange_0.2.0  lubridate_1.9.2  
-##  [9] viridisLite_0.4.1 jsonlite_1.8.4    evaluate_0.20     lifecycle_1.0.3  
-## [13] tibble_3.2.1      pkgconfig_2.0.3   rlang_1.1.0       cli_3.6.1        
-## [17] rstudioapi_0.14   yaml_2.3.7        xfun_0.38         fastmap_1.1.1    
-## [21] stringr_1.5.0     httr_1.4.5        xml2_1.3.3        systemfonts_1.0.4
-## [25] generics_0.1.3    vctrs_0.6.2       sass_0.4.5        hms_1.1.3        
-## [29] webshot_0.5.4     tidyselect_1.2.0  snakecase_0.11.1  svglite_2.1.1    
-## [33] glue_1.6.2        R6_2.5.1          fansi_1.0.4       rmarkdown_2.21   
-## [37] tzdb_0.3.0        purrr_1.0.1       magrittr_2.0.3    scales_1.2.1     
-## [41] htmltools_0.5.5   rvest_1.0.3       colorspace_2.1-0  utf8_1.2.3       
-## [45] stringi_1.7.12    munsell_0.5.0     cachem_1.0.7</code></pre>
+##  [1] bslib_0.4.2      compiler_4.2.3   pillar_1.9.0     jquerylib_0.1.4 
+##  [5] tools_4.2.3      bit_4.0.5        digest_0.6.31    timechange_0.2.0
+##  [9] jsonlite_1.8.4   evaluate_0.20    lifecycle_1.0.3  gtable_0.3.3    
+## [13] pkgconfig_2.0.3  rlang_1.1.0      cli_3.6.1        rstudioapi_0.14 
+## [17] parallel_4.2.3   yaml_2.3.7       xfun_0.38        fastmap_1.1.1   
+## [21] withr_2.5.0      knitr_1.42       hms_1.1.3        generics_0.1.3  
+## [25] sass_0.4.5       vctrs_0.6.2      bit64_4.0.5      grid_4.2.3      
+## [29] tidyselect_1.2.0 snakecase_0.11.1 glue_1.6.2       R6_2.5.1        
+## [33] fansi_1.0.4      vroom_1.6.1      rmarkdown_2.21   tzdb_0.3.0      
+## [37] magrittr_2.0.3   scales_1.2.1     htmltools_0.5.5  colorspace_2.1-0
+## [41] utf8_1.2.3       stringi_1.7.12   munsell_0.5.0    cachem_1.0.7    
+## [45] crayon_1.5.2</code></pre>
 </div>
 
 

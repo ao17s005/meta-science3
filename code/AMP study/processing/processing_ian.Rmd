@@ -1,0 +1,180 @@
+---
+title: "Evaluations of positive and negative stimuli using the Affective Misattribution Procedure (AMP) and self-reports"
+subtitle: "Data processing"
+author: "Template: Ian Hussey; content: [Student name]"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    code_folding: hide
+    highlight: haddock
+    theme: flatly
+    toc: yes
+    toc_float: yes
+---
+
+# TODO
+
+- Add data processing
+- Combine data frames
+- Save to disk
+
+```{r, include=FALSE}
+
+knitr::opts_chunk$set(message = FALSE,
+                      warning = FALSE)
+
+```
+
+# Dependencies
+
+```{r}
+
+library(tidyverse)
+library(janitor) # for clean_names()
+library(stringr)
+
+```
+
+# Get data
+
+```{r}
+
+# demographics
+data_demographics_raw <- read_csv("../../../data/AMP study/raw/data_demographics_raw.csv") |>
+  janitor::clean_names()
+
+data_demographics_raw_messy <- read_csv("../../../data/AMP study/raw/data_demographics_raw_messy.csv", skip = 2) |>
+  janitor::clean_names()
+
+# self report measure
+data_selfreport_raw <- read_csv("../../../data/AMP study/raw/data_selfreport_raw.csv") |>
+  janitor::clean_names()
+
+# affect attribution procedure
+data_amp_raw <- read_csv("../../../data/AMP study/raw/data_amp_raw.csv") |>
+  janitor::clean_names()
+
+```
+
+```{r}
+
+# dat <- data_demographics_raw_messy |>
+#   filter(!trial_code %in% c("prolific ID", "psychiatric diagnosis")) |>
+#   select(subject, date, time, trial_code, key_response)
+
+
+
+```
+
+
+# Demographics
+
+TODO extract age and gender data into wide format
+
+## Option 1
+
+```{r}
+
+dat <- data_demographics_raw |>
+  select(subject, date, time, trialcode, response)
+
+dat_gender <- dat |>
+  filter(trialcode == "gender") |>
+  rename(gender = response) |>
+  mutate(gender = tolower(gender),
+         # regex is useful and awful
+         gender = stringr::str_remove_all(gender, regex("\\W+")),
+         gender = case_when(gender == "female" ~ gender,
+                            gender == "male" ~ gender,
+                            gender == "nonbinary" ~ gender,
+                            gender == "woman" ~ "female",
+                            gender == "man" ~ "male",
+                            TRUE ~ "other/missing/error")) |>
+  select(-trialcode)
+
+dat_gender |>
+  count(gender)
+
+dat_age <- dat |>
+  filter(trialcode == "age") |>
+  rename(age = response) |>
+  mutate(age = as.numeric(age),
+         age = ifelse(is.na(age), "other/missing/error", age)) |>
+  select(-trialcode)
+
+dat_age |>
+  count(age)
+
+dat_age_gender <- 
+  full_join(dat_age, 
+            dat_gender,
+            by = c("subject", "date", "time"))
+
+```
+
+## Option 2
+
+```{r}
+
+dat_wide <- dat |>
+  pivot_wider(names_from = trialcode,
+              values_from = response)
+
+```
+
+# Exclusions / data quality?
+
+```{r}
+
+
+```
+
+# Self-reports
+
+TODO extract self-reported evaluations and convert to a sum score
+
+```{r}
+
+
+
+```
+
+# Affect Misattribution Procedure
+
+TODO extract evaluations on the AMP test blocks and convert to an overall bias score
+
+```{r}
+
+
+
+```
+
+# Combine
+
+TODO combine demographics, self-reports and AMP into a single data frame in wide format, i.e., the processed data
+
+```{r}
+
+
+
+```
+
+# Write to disk
+
+TODO write the processed data to disk
+
+```{r}
+
+
+
+```
+
+# Session info
+
+```{r}
+
+sessionInfo()
+
+```
+
+
