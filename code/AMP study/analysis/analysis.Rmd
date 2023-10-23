@@ -40,18 +40,110 @@ library(tidyverse)
 # Get data
 
 ```{r}
-
-# data_processed <- read_csv("../../../data/AMP study/processed/data_processed.csv")
+# keep all the data processing in the data processing and 
+# all the analysis in the analysis, whenever I think i need to go back to processing
+data_processed <- read_csv("../../../data/AMP study/processed/data_processed.csv")
 
 ```
 
 # Sample descriptives
+# create tables with mean age sd age, count of genders, and % of sample of each gender.
 
 ```{r}
+data_processed |>
+  count(age)
+
+#dat_descriptives <- data_processed |>
+#  mutate(age = as.numeric(age)) |> 
+#  summarise(mean_age = mean(age), na.rm = TRUE,
+#            sd_age = sd(age)) |> 
+#  mutate(mean_age =round(mean_age, 2),
+#         sd_age = round(sd_age, 2))
+
+library(knitr)
+library(kableExtra)
+       
+dat_descriptives <- data_processed |>
+  mutate(age = as.numeric(age)) |> 
+  summarise(mean_age = mean(age, na.rm = TRUE),
+            sd_age = sd(age, na.rm = TRUE)) |> 
+  mutate(mean_age = round(mean_age, 2),
+          sd_age = round(sd_age, 2)) |> 
+  kbl(format = "html") |> 
+  kable_classic(full_width = FALSE)
+
+dat_descriptives
+
+#Alternative
+# mutate_all(.funs = janitor::round_half_up, digits=2) 
+  
+#R rounds differently: bankers rounding, does not work the way we think
+#vec <- c(0.5, 1.5, 2.5, 3.5, 4.5)
+
+#round(vec, 0)
+
+#to round as we know
+#janitor::round_half_up(vec, 0)
+
+
+```
+
+
+
+# a table of overall sample size
+
+```{r}
+
+sample_size <- data_processed |>
+  summarise(sample_size = n()) |> 
+  kbl(format = "html") |> 
+  kable_classic(full_width = FALSE)
+
+sample_size
+
+
+```
+
+
+#A table with both counts and percentages of each gender in the sample.
+
+```{r}
+
+#absolut and relative numbers of gender
+
+dat_gender <- data_processed |>
+  group_by(gender) |> 
+  summarise(gender_n = n(), 
+            gender_p = round((n()/102*100), 2)) |> 
+  kable(format = "html") |> 
+  kable_classic(full_width = FALSE)
+
+dat_gender
 
 
 
 ```
+
+
+# A table with the mean and standard deviation of mean_evaluation, a) for the overall sample, and b) for each gender category.
+
+```{r}
+
+
+dat_descriptives <- data_processed |>
+  mutate(age = as.numeric(age)) |> 
+  group_by(gender) |> 
+  summarise(mean_age = mean(age, na.rm = TRUE),
+            sd_age = sd(age, na.rm = TRUE)) |> 
+  mutate(mean_age = round(mean_age, 2),
+          sd_age = round(sd_age, 2)) |> 
+  kbl(format = "html") |> 
+  kable_classic(full_width = FALSE)
+
+dat_descriptives
+
+```
+
 
 # Analyses
 
