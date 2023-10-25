@@ -80,11 +80,11 @@ TODO extract age and gender data into wide format
 
 ```{r}
 # select relevant column
-dat_gender <- data_demographics_raw %>% 
+dat <- data_demographics_raw %>% 
   select(subject, date, time, trialcode, response)
 
 # gender
-dat_gender <- dat_gender |> 
+dat_gender <- dat |> 
   filter(trialcode == "gender") |> 
   rename(gender = response) |> 
   mutate(gender = tolower(gender),
@@ -102,7 +102,7 @@ dat_gender |>
   count(gender)
 
 # age variable
-dat_age <- data_demographics_raw |> 
+dat_age <- dat |> 
   select(subject, date, time, trialcode, response) |> 
   filter(trialcode == "age") |> 
   rename(age = response) |> 
@@ -180,21 +180,21 @@ After you've changed processing.Rmd, also add to analysis.Rmd in order to create
 
 
 ```{r}
-data_new <- data_amp_raw |> 
-  filter(trialcode != "instructions", 
-         trialcode != "prime_positive_practice",
-         trialcode != "prime_negative_practice") |> 
-  mutate(problematic = as.numeric(case_when(latency < 100 ~ "1", 
-                                 .default = "0")),
-         problematic_n = sum(problematic))
-data_new <- data_amp_raw |> 
-  group_by(problematic) |> 
-  summarize(problematic_n = n())
- 
+library(knitr)
+library(kableExtra)
 
+data_performance_criteria <- data_amp_raw |> 
+  filter(blockcode != "practice", 
+         trialcode != "instructions") |> 
+  mutate(latency_prob = if_else(latency < 100, TRUE, FALSE)) |> 
+  group_by(subject) |> 
+  summarize(proportion_fast_trials_amp = mean(latency_prob))
 
 
 ```
+
+
+
 
 # Self-reports
 
@@ -265,13 +265,44 @@ TODO combine demographics, self-reports and AMP into a single data frame in wide
 
 ```{r}
 
-dat_processed <-
+dat_processed_temp <-
   full_join(dat_age_gender, dat_selfreport,
-            by = c("subject"))
+            by = "subject") |> 
+  full_join(data_performance_criteria, by = "subject")
+
+
+dat_processed_duplicates <- dat_processed_temp |> 
+  count(subject) |> 
+  mutate(exclude_duplicate_data = ifelse(n > 1, "exclude", "include")) |> 
+  select(-n)
+
+dat_processed <-
+  full_join(dat_processed_temp,
+            dat_processed_duplicates,
+            by = "subject") 
 
 #lapply(dat_age_gender, class)
 
 #lapply(dat_selfreport, class)
+
+
+
+```
+
+
+Define master exclusions
+
+```{r}
+
+
+data_processed_with_master_exclusions <- dat_processed |> 
+  mutate(exlude_participant = case_when(tolower(age) == "test" ~ "exclude",
+                                        tolower(gender) == "test" ~ "exclude",
+                                    proportion_fast_trials_amp > .10 ~"exclude", 
+                                    exclude_duplicate_data == "exclude" ~ "exclude",
+                                    is.na(mean_evaluation) ~ "exclude", 
+                                    TRUE ~ "included"))
+
 
 ```
 

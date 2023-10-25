@@ -44,9 +44,52 @@ library(tidyverse)
 # all the analysis in the analysis, whenever I think i need to go back to processing
 data_processed <- read_csv("../../../data/AMP study/processed/data_processed.csv")
 
+
+data_processed_after_exclusions <- data_processed |> 
+  filter(exclude_participant == "include")
+
 ```
 
-# Sample descriptives
+# Sample size before exclusions
+
+
+```{r}
+
+sample_size <- data_processed |>
+  summarise(sample_size = n()) |> 
+  kbl(format = "html") |> 
+  kable_classic(full_width = FALSE)
+
+sample_size
+
+
+data_processed |>
+  count() |> 
+  kbl() |> 
+  kable_classic(full_width = FALSE)
+
+
+
+
+```
+
+# Sample size after exclusions
+
+
+```{r}
+
+data_processed |>
+  filter(exclude_participant == "include") |> 
+  count() |> 
+  kbl() |> 
+  kable_classic(full_width = FALSE)
+
+
+
+
+```
+
+
 # create tables with mean age sd age, count of genders, and % of sample of each gender.
 
 ```{r}
@@ -74,6 +117,8 @@ dat_descriptives <- data_processed |>
 
 dat_descriptives
 
+#Don't do any rounding
+
 #Alternative
 # mutate_all(.funs = janitor::round_half_up, digits=2) 
   
@@ -90,19 +135,7 @@ dat_descriptives
 
 
 
-# a table of overall sample size
 
-```{r}
-
-sample_size <- data_processed |>
-  summarise(sample_size = n()) |> 
-  kbl(format = "html") |> 
-  kable_classic(full_width = FALSE)
-
-sample_size
-
-
-```
 
 
 #A table with both counts and percentages of each gender in the sample.
@@ -150,7 +183,7 @@ dat_descriptives
 ## Self-reported evalautions
 
 ```{r}
-
+#rounding is only done before printing
 
 
 ```
